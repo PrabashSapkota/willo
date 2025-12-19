@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,17 +22,14 @@
       background-color: black;
       color: white;
       font-family: Arial, sans-serif;
+      overflow:hidden;
     }
 
     #player-container {
       width: 100%;
-      max-width: 800px;
+      max-width: 100%;
       aspect-ratio: 16 / 9;
-      margin: 10px 0;
       position: relative;
-      background-color: black;
-      border: 2px solid #333;
-      border-radius: 8px;
       overflow: hidden;
     }
 
@@ -41,54 +39,21 @@
       background-color: black;
     }
 
-    #status-message {
-      margin-top: 10px;
-      font-size: 16px;
-      color: #ccc;
-    }
   </style>
 </head>
-<script
-  type="text/javascript"
-  src="https://troopinvariably.com/37/d7/1a/37d71a290dde379f3d1016fe3009fb4b.js"
-></script>
+
 <body>
-  <!-- Top Ad -->
-  <div class="ad-container">
-    <script type="text/javascript">
-      atOptions = {
-        'key': 'db78e49a3c97dc3562c3b48559ea4a28',
-        'format': 'iframe',
-        'height': 50,
-        'width': 320,
-        'params': {}
-      };
-    </script>
-    <script type="text/javascript" src="//troopinvariably.com/db78e49a3c97dc3562c3b48559ea4a28/invoke.js"></script>
-  </div>
+ 
 
   <!-- Player -->
   <div id="player-container">
     <video id="video" autoplay playsinline muted></video>
   </div>
 
-  <div id="status-message">Initializing player...</div>
 
-  <!-- Bottom Ad -->
-  <div class="ad-container">
-    <script type="text/javascript">
-      atOptions = {
-        'key': 'db78e49a3c97dc3562c3b48559ea4a28',
-        'format': 'iframe',
-        'height': 50,
-        'width': 320,
-        'params': {}
-      };
-    </script>
-    <script type="text/javascript" src="//troopinvariably.com/db78e49a3c97dc3562c3b48559ea4a28/invoke.js"></script>
-  </div>
 
-  <script>
+
+ <script>
     async function initPlayer() {
       const video = document.getElementById('video');
       const container = document.getElementById('player-container');
@@ -156,6 +121,5 @@
     document.addEventListener('DOMContentLoaded', initPlayer);
   </script>
 
-  <script disable-devtool-auto src="https://cdn.jsdelivr.net/npm/disable-devtool@latest"></script>
 </body>
 </html>
