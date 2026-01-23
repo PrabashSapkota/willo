@@ -1,125 +1,143 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Player</title>
+  <meta charset="UTF-8"> 
 
-  <!-- Shaka Player -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: black;
-      color: white;
-      font-family: Arial, sans-serif;
-      overflow:hidden;
-    }
+  <meta name="referrer" content="no-referrer"> 
 
-    #player-container {
-      width: 100%;
-      max-width: 100%;
-      aspect-ratio: 16 / 9;
-      position: relative;
-      overflow: hidden;
-    }
+  <title>Willow FHD</title> 
 
-    video {
-      width: 100%;
-      height: 100%;
-      background-color: black;
-    }
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.6/controls.min.css" crossorigin="anonymous"> 
 
-  </style>
-</head>
+  <link rel="stylesheet" href="https://livecrichdofficial.pages.dev/livecrichd2.css"> 
 
-<body>
  
+ <body>
 
-  <!-- Player -->
-  <div id="player-container">
-    <video id="video" autoplay playsinline muted></video>
+
+  <!-- Willow FHD Player Section -->
+
+  <div id="player-container" class="hide"> 
+
+   <div data-shaka-player-container="" class="shaka-video-container shaka-mobile" shaka-controls="true"> 
+
+    <video autoplay="" data-shaka-player="" id="video" poster="#" class="shaka-video" src="blob:https://yourdomain.site/bd7e80b4-3cfc-47a8-9c12-8ce4dcb722fb"></video> 
+
+    <canvas class="shaka-canvas-container"></canvas>
+
+    <!-- The rest of your shaka-player controls and overlays remain unchanged -->
+
+    <div class="shaka-controls-container" shown="true"> ... </div>
+
+    <div class="shaka-client-side-ad-container shaka-hidden"></div>
+
+    <div class="shaka-spinner-container shaka-hidden">
+
+     <div class="shaka-spinner">
+
+      <svg class="shaka-spinner-svg" viewbox="0 0 30 30">
+
+       <circle class="shaka-spinner-path" cx="15" cy="15" r="14.5" fill="none" stroke-width="1" stroke-miterlimit="10"></circle>
+
+      </svg>
+
+     </div>
+
+    </div>
+
+    <div class="shaka-text-container" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;"></div>
+
+   </div> 
+
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.6/shaka-player.ui.min.js" crossorigin="anonymous"></script>
+
+  <script>
 
 
+    // Shaka Player initialization (your original script)
 
- <script>
-    async function initPlayer() {
+    const manifestUri = "https://otte.live.fly.ww.aiv-cdn.net/bom-nitro/live/dash/enc/bsaaetko8v/out/v1/bd3b0c314fff4bb1ab4693358f3cd2d3/cenc.mpd"
+
+    async function init() {
+
       const video = document.getElementById('video');
-      const container = document.getElementById('player-container');
-      const status = document.getElementById('status-message');
 
-      shaka.polyfill.installAll();
+      const ui = video['ui'];
 
-      if (!shaka.Player.isBrowserSupported()) {
-        status.textContent = "Browser not supported!";
-        return;
-      }
+      const controls = ui.getControls();
 
-      const player = new shaka.Player(video);
-      const ui = new shaka.ui.Overlay(player, container, video);
+      const player = controls.getPlayer();
 
-      // Player config for smooth buffering
+      window.player = player;
+
+      window.ui = ui;
+
       player.configure({
-        streaming: {
-          bufferingGoal: 10,
-          rebufferingGoal: 2,
-          startAtSegmentBoundary: true,
-          lowLatencyMode: true
-        },
-        manifest: {
-          dash: {
-            ignoreMinBufferTime: true
-          }
-        },
+
         drm: {
-          clearKeys: {
-            'e6e5c8033a76eaa14cf5f043c63684c6': '45a1607cbb02e1a1f673bae2e607bbd4'
+
+          "clearKeys": {
+
+            "d0f2e5c39e70c18f29bf77768a1ad89a":"d6853c51fcf37a18905f0609972395d7"
+
           }
+
         }
+
       });
 
-      // Your MPD URL
-      const streamUrl = "https://ottb.live.cf.ww.aiv-cdn.net/lhr-nitro/live/clients/dash/enc/jmjjscadmf/out/v1/911c6ff00f1a45258e7944abf338702b/cenc.mpd";
+      player.addEventListener('error', onPlayerErrorEvent);
 
-      // Load stream
+      controls.addEventListener('error', onUIErrorEvent);
+
       try {
-        await player.load(streamUrl);
-        console.log("✅ Stream loaded successfully!");
-        status.textContent = "Stream loaded successfully!";
 
-        // Try autoplay (unmuted if possible)
-        try {
-          video.muted = false;
-          await video.play();
-        } catch {
-          video.muted = true;
-          await video.play();
-        }
+        await player.load(manifestUri);
+
+        console.log('The video has now been loaded!');
+
       } catch (error) {
-        console.error("Stream load failed:", error);
-        status.textContent = "⚠️ Failed to load stream. Please try again.";
+
+        onPlayerError(error);
+
       }
 
-      // Error listener
-      player.addEventListener('error', e => {
-        console.error("Player error:", e.detail);
-        status.textContent = "⚠️ Playback error.";
-      });
     }
 
-    document.addEventListener('DOMContentLoaded', initPlayer);
+    function onPlayerErrorEvent(errorEvent) {
+
+      onPlayerError(errorEvent.detail);
+
+    }
+
+    function onPlayerError(error) {
+
+      console.error('Error code', error.code, 'object', error);
+
+    }
+
+    function onUIErrorEvent(errorEvent) {
+
+      onPlayerError(errorEvent.detail);
+
+    }
+
+    function initFailed(errorEvent) {
+
+      console.error('Unable to load the UI library!');
+
+    }
+
+    document.addEventListener('shaka-ui-loaded', init);
+
+    document.addEventListener('shaka-ui-load-failed', initFailed);
+
   </script>
 
-</body>
+  
+
+ </body>
+
 </html>
