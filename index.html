@@ -1,143 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Willow FHD - Delayed Live</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.6/controls.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://livecrichdofficial.pages.dev/livecrichd2.css">
+</head>
+<body>
 
-  <meta charset="UTF-8"> 
+<!-- Willow FHD Player Section -->
+<div id="player-container">
+    <div data-shaka-player-container="" class="shaka-video-container shaka-mobile" shaka-controls="true">
+        <video autoplay="" data-shaka-player="" id="video" poster="#" class="shaka-video"></video>
+        <canvas class="shaka-canvas-container"></canvas>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-
-  <meta name="referrer" content="no-referrer"> 
-
-  <title>Willow FHD</title> 
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.6/controls.min.css" crossorigin="anonymous"> 
-
-  <link rel="stylesheet" href="https://livecrichdofficial.pages.dev/livecrichd2.css"> 
-
- 
- <body>
-
-
-  <!-- Willow FHD Player Section -->
-
-  <div id="player-container" class="hide"> 
-
-   <div data-shaka-player-container="" class="shaka-video-container shaka-mobile" shaka-controls="true"> 
-
-    <video autoplay="" data-shaka-player="" id="video" poster="#" class="shaka-video" src="blob:https://yourdomain.site/bd7e80b4-3cfc-47a8-9c12-8ce4dcb722fb"></video> 
-
-    <canvas class="shaka-canvas-container"></canvas>
-
-    <!-- The rest of your shaka-player controls and overlays remain unchanged -->
-
-    <div class="shaka-controls-container" shown="true"> ... </div>
-
-    <div class="shaka-client-side-ad-container shaka-hidden"></div>
-
-    <div class="shaka-spinner-container shaka-hidden">
-
-     <div class="shaka-spinner">
-
-      <svg class="shaka-spinner-svg" viewbox="0 0 30 30">
-
-       <circle class="shaka-spinner-path" cx="15" cy="15" r="14.5" fill="none" stroke-width="1" stroke-miterlimit="10"></circle>
-
-      </svg>
-
-     </div>
-
+        <div class="shaka-controls-container" shown="true">...</div>
+        <div class="shaka-client-side-ad-container shaka-hidden"></div>
+        <div class="shaka-spinner-container shaka-hidden">
+            <div class="shaka-spinner">
+                <svg class="shaka-spinner-svg" viewBox="0 0 30 30">
+                    <circle class="shaka-spinner-path" cx="15" cy="15" r="14.5" fill="none" stroke-width="1" stroke-miterlimit="10"></circle>
+                </svg>
+            </div>
+        </div>
+        <div class="shaka-text-container" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;"></div>
     </div>
+</div>
 
-    <div class="shaka-text-container" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.6/shaka-player.ui.min.js" crossorigin="anonymous"></script>
 
-   </div> 
+<script>
+// Shaka Player initialization with 10-second delay for stability
+const manifestUri = "https://a166aivottlinear-a.akamaihd.net/OTTB/sin-nitro/live/clients/dash/enc/inpyms8ezu/out/v1/1084d5c9a97a4c5b9f9554c88f486646/cenc.mpd";
 
-  </div>
+async function init() {
+    const video = document.getElementById('video');
+    const ui = video['ui'];
+    const controls = ui.getControls();
+    const player = controls.getPlayer();
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.6/shaka-player.ui.min.js" crossorigin="anonymous"></script>
+    window.player = player;
+    window.ui = ui;
 
-  <script>
-
-
-    // Shaka Player initialization (your original script)
-
-    const manifestUri = "https://a166aivottlinear-a.akamaihd.net/OTTB/sin-nitro/live/clients/dash/enc/inpyms8ezu/out/v1/1084d5c9a97a4c5b9f9554c88f486646/cenc.mpd"
-
-    async function init() {
-
-      const video = document.getElementById('video');
-
-      const ui = video['ui'];
-
-      const controls = ui.getControls();
-
-      const player = controls.getPlayer();
-
-      window.player = player;
-
-      window.ui = ui;
-
-      player.configure({
-
+    // Main configuration - increased buffering + live delay for stability
+    player.configure({
         drm: {
-
-          "clearKeys": {
-
-            "065051b99bf5cf8d9a3bde5cbde6aaf9":"214bd176832872339ce184338320f9a2"
-
-          }
-
+            "clearKeys": {
+                "065051b99bf5cf8d9a3bde5cbde6aaf9": "214bd176832872339ce184338320f9a2"
+            }
+        },
+        streaming: {
+            bufferingGoal: 18,           // Buffer more ahead (helps stability, increases latency)
+            rebufferingGoal: 8,          // More buffer needed before playing/resuming
+            bufferBehind: 30,            // Keep more history behind current position
+            lowLatencyMode: false,       // Disable low-latency mode (we want higher delay)
+            autoLowLatencyMode: false,
+            
+            // Live sync settings to enforce ~10s delay behind live edge
+            liveSync: true,
+            liveSyncMaxLatency: 12,      // Max allowed latency ~12s
+            liveSyncMinLatency: 8,       // Target around 8-12s behind live
+            liveSyncPlaybackRate: 1.0,   // Normal speed (can try 0.95-1.05 if needed)
+            liveSyncMinPlaybackRate: 0.95,
+            liveSyncMaxPlaybackRate: 1.05
+        },
+        manifest: {
+            dash: {
+                autoCorrectDrift: true   // Helps with timing on live streams
+            }
         }
+    });
 
-      });
+    player.addEventListener('error', onPlayerErrorEvent);
+    controls.addEventListener('error', onUIErrorEvent);
 
-      player.addEventListener('error', onPlayerErrorEvent);
-
-      controls.addEventListener('error', onUIErrorEvent);
-
-      try {
-
+    try {
         await player.load(manifestUri);
+        console.log('Video loaded with ~10s delay for better stability!');
 
-        console.log('The video has now been loaded!');
-
-      } catch (error) {
-
+        // Optional: Force go to live edge after load (with delay applied)
+        // setTimeout(() => player.goToLive(), 2000);
+    } catch (error) {
         onPlayerError(error);
-
-      }
-
     }
+}
 
-    function onPlayerErrorEvent(errorEvent) {
+function onPlayerErrorEvent(errorEvent) {
+    onPlayerError(errorEvent.detail);
+}
 
-      onPlayerError(errorEvent.detail);
+function onPlayerError(error) {
+    console.error('Error code', error.code, 'object', error);
+}
 
-    }
+function onUIErrorEvent(errorEvent) {
+    onPlayerError(errorEvent.detail);
+}
 
-    function onPlayerError(error) {
+function initFailed(errorEvent) {
+    console.error('Unable to load the UI library!');
+}
 
-      console.error('Error code', error.code, 'object', error);
+document.addEventListener('shaka-ui-loaded', init);
+document.addEventListener('shaka-ui-load-failed', initFailed);
+</script>
 
-    }
-
-    function onUIErrorEvent(errorEvent) {
-
-      onPlayerError(errorEvent.detail);
-
-    }
-
-    function initFailed(errorEvent) {
-
-      console.error('Unable to load the UI library!');
-
-    }
-
-    document.addEventListener('shaka-ui-loaded', init);
-
-    document.addEventListener('shaka-ui-load-failed', initFailed);
-
-  </script>
-
-  
-
- </body>
-
+</body>
 </html>
