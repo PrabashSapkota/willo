@@ -33,7 +33,7 @@
 
 <script>
 // Shaka Player initialization with 10-second delay for stability
-const manifestUri = "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/3b7qwiqzk3/out/v1/9f14895badca43e6a716db021dcd0c31/cenc.mpd";
+const manifestUri = "https://cors-proxy.cooks.fyi/https://ev-fast-mpd.starzplayarabia.com/live/eds/CricLife1/DASH/CricLife1.mpd";
 
 async function init() {
     const video = document.getElementById('video');
@@ -48,7 +48,7 @@ async function init() {
     player.configure({
         drm: {
             "clearKeys": {
-                "dc69b6159a0f9f0a4e03b3ff91cbacd5": "d0dcbcd7723bc40df0bf34c9c092d51f"
+                "1e23e51b09a67b83813c17049870bcd4": "c3d6288e378b0dc55320fd0e6fd2e55f"
             }
         },
         streaming: {
