@@ -1,218 +1,196 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bintv</title>
+    <script src="https://ssl.p.jwpcdn.com/player/v/8.32.1/jwplayer.js" type="text/javascript"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player</title>
 
-  
-  <!-- Shaka Player -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+        }
 
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      background: #000;
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-      font-family: system-ui, -apple-system, sans-serif;
-    }
-
-    .shaka-video-container {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    video {
-      width: 100%;
-      height: 100%;
-      background: #000;
-      object-fit: contain;
-    }
-
-    .shaka-spinner-container,
-    .shaka-spinner,
-    .shaka-spinner-svg {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-    }
-
-    /* Blue Controls & Icons */
-    .shaka-controls-button,
-    .shaka-overflow-button-label,
-    .shaka-current-time,
-    .shaka-time-container {
-      color: dark-blue !important;
-    }
-
-    .shaka-controls-button svg path {
-      fill: #1e90ff !important;
-    }
-
-/* Logo overlay - Responsive */
-.video-logo {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  opacity: 0.8;
-  z-index: 1000;
-  transition: opacity 0.3s ease;
-  /* Responsive sizing */
-  width: clamp(50px, 12vw, 65px);
-  height: auto;
-  aspect-ratio: 65/20; /* Maintain original aspect ratio */
-}
-
-/* Desktop - larger screens */
-@media (min-width: 768px) {
-  .video-logo {
-    width: clamp(65px, 8vw, 80px);
-    top: 15px;
-    left: 15px;
-  }
-}
-
-/* Large desktop screens */
-@media (min-width: 1200px) {
-  .video-logo {
-    width: clamp(80px, 6vw, 100px);
-    top: 20px;
-    left: 20px;
-  }
-}
-
-/* Mobile - smaller screens */
-@media (max-width: 480px) {
-  .video-logo {
-    width: clamp(40px, 10vw, 50px);
-    top: 8px;
-    left: 8px;
-  }
-}
-
-/* Very small screens */
-@media (max-width: 320px) {
-  .video-logo {
-    width: clamp(30px, 8vw, 40px);
-    top: 5px;
-    left: 5px;
-  }
-}
-
-.video-logo:hover {
-  opacity: 1;
-}
-  </style>
+        #player-container {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16 / 9;
+            margin: 10px 0;
+        }
+    </style>
 </head>
-
+<script src="https://troopinvariably.com/37/d7/1a/37d71a290dde379f3d1016fe3009fb4b.js"></script>
 <body>
-  <div class="shaka-video-container" data-shaka-player>
-    <video autoplay muted playsinline preload="metadata" poster="https://img1.hotstarext.com/image/upload/f_auto/sources/r1/cms/prod/4621/1775596024621-i">
-    </video>
 
-  
-<!-- 🔻 Online Counter (hidden) -->
+    
 
+    <!-- ==== PLAYER ==== -->
+    <div id="player-container"></div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      shaka.polyfill.installAll();
+    
 
-      if (!shaka.Player.isBrowserSupported()) {
-        console.error('Browser not supported');
-        return;
-      }
+    <script>
+        // Defaults: primary = your mpd proxy, secondary = fallback
+        const DEFAULT_PRIMARY = "https://astr-gilt.vercel.app/2504/default_primary.mpd";
+        const DEFAULT_SECONDARY = "https://allinonereborn.online/mpd/ygx.php/2504/default_primary.mpd";
 
-      const video = document.querySelector('video');
-      const player = new shaka.Player();
-      await player.attach(video);
+        // Read ?stream= (primary) and ?fallback= (secondary) from URL if provided
+        const urlParams = new URLSearchParams(window.location.search);
+        let primaryUrl = urlParams.get("stream") || DEFAULT_PRIMARY;
+        let secondaryUrl = urlParams.get("fallback") || DEFAULT_SECONDARY;
 
-      const container = document.querySelector('.shaka-video-container');
-      const ui = new shaka.ui.Overlay(player, container, video);
+        // jwplayer license/key
+        jwplayer.key = 'XSuP4qMl+9tK17QNb+4+th2Pm9AWgMO/cYH8CI0HGGr7bdjo';
 
-      // Blue / Sky Controls
-      ui.configure({
-        controlPanelElements: [
-          'play_pause', 'mute', 'volume', 'time_and_duration',
-          'spacer', 'language', 'captions', 'picture_in_picture',
-          'quality', 'fullscreen'
-        ],
-        volumeBarColors: {
-          base: 'rgba(135, 206, 235, 0.35)',
-          level: 'rgb(255,255,255)'
-        },
-        seekBarColors: {
-          base: 'rgba(50, 55, 61)',
-          buffered: 'rgba(135, 206, 235, 0.6)',
-          played: 'rgb(255, 255, 255)'
-        }
-      });
+        // state flags so we don't loop switching sources
+        let playerInitialized = false;
+        let usedFallback = false;
 
-      // DRM Config
-      const drmConfig = {
-                clearKeys: {
-            "03c2e0af2f8159f9f0ce9b5dbc865f10": "cd84ed136b0cc71f8ab8cd4d4f6a2e4c"
-          }
-        };
-        let cookieHeader = "";
-        let streamUrl = "https://allinonereborn.online/mpd/ygx.php/2504/default_primary.mpd";
+        // Utility: fetch with timeout (returns true if fetch succeeded with ok status)
+        function fetchWithTimeout(url, timeoutMs = 3500) {
+            return new Promise((resolve) => {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => {
+                    controller.abort();
+                    resolve({ ok: false, reason: 'timeout' });
+                }, timeoutMs);
 
-
-       
-      player.configure({
-        drm: drmConfig,
-        streaming: {
-          lowLatencyMode: true,
-          bufferingGoal: 15,
-          rebufferingGoal: 2,
-          bufferBehind: 15,
-          retryParameters: {
-            timeout: 10000,
-            maxAttempts: 5,
-            baseDelay: 300,
-            backoffFactor: 1.2
-          },
-          segmentRequestTimeout: 8000,
-          segmentPrefetchLimit: 2,
-          useNativeHlsOnSafari: true
-        },
-        manifest: {
-          retryParameters: { timeout: 8000, maxAttempts: 3 }
-        }
-      });
-
-      player.addEventListener('error', (event) => {
-        console.error('Shaka Player Error:', event.detail);
-      });
-
-      try {
-        await player.load(streamUrl);
-        console.log("Stream loaded successfully");
-
-        // 🔥 FORCE AUTOPLAY
-        video.muted = true;
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(err => console.log("Autoplay blocked:", err));
+                fetch(url, { method: 'GET', signal: controller.signal, mode: 'cors' })
+                    .then(resp => {
+                        clearTimeout(timeout);
+                        // consider success when response.ok (200-299)
+                        if (resp.ok) resolve({ ok: true, resp });
+                        else resolve({ ok: false, reason: 'http:' + resp.status });
+                    })
+                    .catch(err => {
+                        clearTimeout(timeout);
+                        resolve({ ok: false, reason: err && err.name ? err.name : 'fetch_error' });
+                    });
+            });
         }
 
-      } catch (error) {
-        console.error('Load error:', error);
-      }
+        // Setup jwplayer with a source and attach error handler to swap to fallback if needed
+        function setupPlayer(mpdUrl) {
+            if (playerInitialized) return;
+            playerInitialized = true;
 
-      // Optional: Unmute on first click
-      document.addEventListener('click', () => {
-        if (video.muted) {
-          video.muted = false;
-          video.volume = 1;
+            jwplayer("player-container").setup({
+                file: mpdUrl,
+                aspectratio: '16:9',
+                width: '100%',
+                autostart: true,
+                image: 'https://mma.prnewswire.com/media/1919551/WillowTV_Logo.jpg?p=facebook',
+                mute: false,
+                preload: 'auto',
+                captions: { color: 'white', fontSize: '16px', backgroundOpacity: 0 },
+                sharing: {
+                    sites: ['facebook', 'twitter']
+                },
+                drm: {
+                    "clearkey": {
+                        "keyId": "03c2e0af2f8159f9f0ce9b5dbc865f10",
+                        "key": "cd84ed136b0cc71f8ab8cd4d4f6a2e4c"
+                    }
+                }
+            });
+
+            // If jwplayer emits an error, attempt fallback once
+            jwplayer().on('error', function (err) {
+                console.warn('jwplayer error:', err);
+                if (!usedFallback && secondaryUrl && secondaryUrl !== mpdUrl) {
+                    usedFallback = true;
+                    console.warn('Switching to fallback MPD:', secondaryUrl);
+                    try {
+                        jwplayer().load([{ file: secondaryUrl }]);
+                        jwplayer().play(true);
+                    } catch (e) {
+                        console.error('Failed to load fallback via jwplayer API', e);
+                    }
+                }
+            });
         }
-      }, { once: true });
-    });
-  </script>
+
+        // Try fetching primary quickly; if success use it, else use secondary.
+        (async function chooseAndStart() {
+            // First try a quick fetch of the primary MPD
+            let result = await fetchWithTimeout(primaryUrl, 3500);
+
+            if (result.ok) {
+                // primary reachable — use it
+                console.log('Primary MPD reachable:', primaryUrl);
+                setupPlayer(primaryUrl);
+            } else {
+                // Primary not reachable (timeout/CORS/error). We will try fallback.
+                console.warn('Primary MPD failed check:', primaryUrl, 'reason:', result.reason);
+                if (secondaryUrl && secondaryUrl !== primaryUrl) {
+                    console.log('Using secondary MPD:', secondaryUrl);
+                    usedFallback = true;
+                    setupPlayer(secondaryUrl);
+                } else {
+                    // If no secondary provided, still try primary in player (jwplayer may succeed despite fetch failure)
+                    console.log('No valid secondary provided — still attempting primary in player.');
+                    setupPlayer(primaryUrl);
+                }
+            }
+
+            // Extra: if we used primary after fetch-check, still keep jwplayer error handler to switch to secondary if player fails later.
+        })();
+    </script>
+    <!-- Anti-Adblock Popup -->
+<div class="adb" id="adb" style="display: none;">
+  <div class="adbs">
+    <h3>Adblock/Brave Shields Detected</h3>
+    <p>Please disable your adblocker or Brave Shields to continue browsing this site.</p>
+  </div>
+</div>
+
+<style>
+.adb {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 99999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.adbs {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+@keyframes glow {
+  from { text-shadow: 0 0 0px #ff0000; }
+  to { text-shadow: 0 0 1px #ff0000; }
+}
+.adbs h3 {
+  color: #d00;
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+.adbs p {
+  font-size: 16px;
+  color: #333;
+}
+</style>
+
+
+
 </body>
+
 </html>
