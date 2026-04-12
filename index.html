@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bintv</title>
+  <title>Sky by CineArena</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%231E40AF;stop-opacity:1' /><stop offset='100%' style='stop-color:%233B82F6;stop-opacity:1' /></linearGradient></defs><rect x='5' y='5' width='50' height='50' rx='10' fill='url(%23grad)'/><text x='30' y='38' text-anchor='middle' font-family='Arial, sans-serif' font-size='24' font-weight='bold' fill='white'>CA</text></svg>">
 
   
   <!-- Shaka Player -->
@@ -113,11 +114,24 @@
 
 <body>
   <div class="shaka-video-container" data-shaka-player>
-    <video autoplay muted playsinline preload="metadata" poster="https://indiantvinfo.com/media/2026/03/Point-Table-of-2026-IPL.jpg">
+    <video autoplay muted playsinline preload="metadata"
+      poster="https://blogger.googleusercontent.com/img/a/AVvXsEiGqaZeRBZ6Y7yV5ZYSRiNRhBa5q9_EMx7R5TJcHd3XJwwHh2YhNOGt76Y4vEcUIjvIaA7W-Tw1RyMLP-4WZwVHA4mk18zwXl7HdSL5WabprIasDOWJO7jpL0zTQB4p_y7X0Rv0xwe-cJ-GvxofAgeRp2FIiNgB90n_b8Cqw0sAaZqVhJg_fi9UyfSO8KY">
     </video>
 
-  
+    <!-- Logo Overlay with Telegram Link 
+    <a href="https://t.me/cine_arena" target="_blank" rel="noopener noreferrer" style="display: block;">
+      <img class="video-logo" src="" alt="">
+    </a> -->
+  </div>
+
 <!-- 🔻 Online Counter (hidden) -->
+<div style="display:none;">
+  <script src="//widget.supercounters.com/ssl/online_t.js"></script>
+  <script>
+    sc_online_t(1707487,"Users Online","170ddb");
+  </script>
+  <noscript><a href="https://www.supercounters.com/">supercounters.com</a></noscript>
+</div>
 
 
   <script>
@@ -156,14 +170,14 @@
 
       // DRM Config
       const drmConfig = {
-                      clearKeys: {  
-          "2e2636daa74141b68cc14882ea3ff82b": "0961f48287324adbb4b7ff3c9d82b3c9"  
-        }  
-      };  
-  
-      let streamUrl = "https://dice-live-oc.akamaized.net/hdntl=exp=1776067493~acl=%2f*~id=ddf19d4c-e79e-43fa-ac60-93421ab352f6~data=hdntl,aXA9NjUuMS45Mi4yMjImZXhwPTE3NzU5ODExMjMmZWlkPTgzNzkxNyZvaWQ9MjImdHlwZT1WT0QmdWlkPW51bGwmY2lkPW51bGwmcHQ9bnVsbA~hmac=857b1e7c88c1b3b67c44f918f41093f1f80f29822e34031873baceadb9a73496/dash/live/2093734/219028-313801/manifest-d.mpd";  
-  
-  
+                clearKeys: {
+            "2e2636daa74141b68cc14882ea3ff82b": "0961f48287324adbb4b7ff3c9d82b3c9"
+          }
+        };
+        let cookieHeader = "";
+        let streamUrl = "https://dice-live-oc.akamaized.net/hdntl=exp=1776067493~acl=%2f*~id=ddf19d4c-e79e-43fa-ac60-93421ab352f6~data=hdntl,aXA9NjUuMS45Mi4yMjImZXhwPTE3NzU5ODExMjMmZWlkPTgzNzkxNyZvaWQ9MjImdHlwZT1WT0QmdWlkPW51bGwmY2lkPW51bGwmcHQ9bnVsbA~hmac=857b1e7c88c1b3b67c44f918f41093f1f80f29822e34031873baceadb9a73496/dash/live/2093734/219028-313801/manifest-d.mpd";
+
+
        
       player.configure({
         drm: drmConfig,
