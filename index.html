@@ -111,13 +111,13 @@
 
       player.configure({
         drm: {
-          clearKeys: { "2c338a117d434ce4bbe3569231af90f1": "a9633d901ee8a3f4f58ac314b5c5f4fb" }
+          clearKeys: { "1f68713028d439ec03be07f56c1d6213": "20093db6455160fffed4c394def3193d" }
         },
         streaming: { bufferingGoal: 20, rebufferingGoal: 2, bufferBehind: 20 }
       });
 
       try {
-        await player.load("https://qp-pldt-live-bpk-ucd-prod.akamaized.net/bpk-tv/fifa_ppv1/default/index.mpd");
+        await player.load("https://otte.cache.aiv-cdn.net/iad-nitro/live/clients/enc/mmohpwovep/out/v1/fc40f22f10374517a2784e1d97cb23f4/cenc.mpd");
         showStatus('');
         video.muted = false;
         video.play().catch(function() {});
