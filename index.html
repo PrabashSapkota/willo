@@ -111,13 +111,13 @@
 
       player.configure({
         drm: {
-          clearKeys: { "3a2433a92dedb0c0c1d7cdc1b5bd8d1b": "b78e03fc79ff67f1d68d34a1f0d161b9" }
+          clearKeys: { "1f68713028d439ec03be07f56c1d6213": "20093db6455160fffed4c394def3193d" }
         },
         streaming: { bufferingGoal: 20, rebufferingGoal: 2, bufferBehind: 20 }
       });
 
       try {
-        await player.load("https://abkyrm4aaaaaaaamfyfksth3wr44v.ta.bia-cf.live.pv-cdn.net/iad-nitro/live/clients/dash/enc/j9ltx4zek5/out/v1/5bb73ac9fa904dcfafc4972c496d831b/cenc.mpd");
+        await player.load("https://otte.cache.aiv-cdn.net/iad-nitro/live/clients/enc/ij9zrhnfrb/out/v1/31d30c91fc65458789b84209d3fa22e4/cenc.mpd");
         showStatus('');
         video.muted = false;
         video.play().catch(function() {});
