@@ -111,13 +111,13 @@
 
       player.configure({
         drm: {
-          clearKeys: { "0bfd72dcc317a46b442c5eb3f293aac6": "1aca7da5cd5e6246829716334feec5c7" }
+          clearKeys: { "0182ed7af02734ecb17a2f55eec98f99": "60346785b1095596de621031e9daf3ec" }
         },
         streaming: { bufferingGoal: 20, rebufferingGoal: 2, bufferBehind: 20 }
       });
 
       try {
-        await player.load("https://abfjk4haaaaaaaampv6ofhkihi4r6.bia-cf.live.pv-cdn.net/iad-nitro/live/clients/dash/enc/hv0umqrko2/out/v1/9ccf0d5b729a4c88a42de20bbfa0d875/cenc.mpd");
+        await player.load("	https://edge-fastly-m6web.live.6cloud.fr/out/v1/6play/6play-m6/cmaf_cenc00/dash-short-hd.mpd");
         showStatus('');
         video.muted = false;
         video.play().catch(function() {});
