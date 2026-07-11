@@ -111,13 +111,13 @@
 
       player.configure({
         drm: {
-          clearKeys: { "14eeabf30c14b7fbf3008c03099ce011": "17d2ac8dbc5429bd70af3433aa12158d" }
+          clearKeys: { "aa78205160ef4b5c972d5e815a8fe6e4": "338b545591e45469e71dae3a8fb8dbb0" }
         },
         streaming: { bufferingGoal: 20, rebufferingGoal: 2, bufferBehind: 20 }
       });
 
       try {
-        await player.load("https://otte-qw.live.pv-cdn.net/bom-nitro/live/clients/dash/enc/w0rehjjrwe/out/v1/69a2a7041395406b970598f61680e7cf/cenc.mpd");
+        await player.load("https://teleamazonasb.cdn.mdstrm.com/live-stream-mp/dfzu2jckcs3he/a5e7a2777ea24b8ca49b326b536f87b2/6a0cd90eb3852427fcded197/manifest.mpd");
         showStatus('');
         video.muted = false;
         video.play().catch(function() {});
