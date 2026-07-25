@@ -111,13 +111,13 @@
 
       player.configure({
         drm: {
-          clearKeys: { "7e9239c1982d984a002df3ed049d0756": "1b8a17598129a3618535c8fb05f103fe" }
+          clearKeys: { "6983b606bdb28b82045403f1eefe5610": "6622407db20fcff43b6936f8acb77b5e" }
         },
         streaming: { bufferingGoal: 20, rebufferingGoal: 2, bufferBehind: 20 }
       });
 
       try {
-        await player.load("https://footfytv.pro/proxy/direct?url=https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/fdb3pubmek/out/v1/aefca6420f944a9482e117f315de535f/cenc.mpd");
+        await player.load("https://a96aivottlinear-a.akamaihd.net/OTTB/pdx-nitro/live/clients/dash/enc/o1r53zob8g/out/v1/cb2a0ec1911945c892ef8d2145deb5d6/cenc.mpd");
         showStatus('');
         video.muted = false;
         video.play().catch(function() {});
