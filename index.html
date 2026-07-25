@@ -22,44 +22,14 @@ html, body { width: 100%; height: 100%; background: #000; overflow: hidden; font
   </div>
 </div>
 <script>
-var player = null;
-var video = null;
-var retryTimer = null;
-var retryDelay = 2000; // start at 2s, backs off
-var manifestUri = "";
-
 function silentLog(msg, err) {
-  // Errors go to console only — never shown to the user
+  // Errors go to console only — never shown to the user, never retried
   console.error(msg, err || '');
 }
 
-function scheduleRetry() {
-  if (retryTimer) return; // already scheduled
-  retryTimer = setTimeout(function() {
-    retryTimer = null;
-    attemptLoad();
-  }, retryDelay);
-  // gentle exponential backoff, capped at 15s
-  retryDelay = Math.min(retryDelay * 1.5, 15000);
-}
-
-async function attemptLoad() {
-  if (!player) return;
-  try {
-    await player.load(manifestUri);
-    retryDelay = 2000; // reset backoff on success
-    video.muted = false;
-    video.play().catch(function(){});
-  } catch (e) {
-    silentLog('Load failed, retrying silently', e);
-    scheduleRetry();
-  }
-}
-
 function onPlayerError(error) {
-  silentLog('Shaka error (suppressed from UI)', error);
-  // Don't show anything to the user — just try to recover
-  scheduleRetry();
+  silentLog('Shaka error (suppressed from UI, no retry)', error);
+  // Intentionally do nothing else — leave playback as-is
 }
 
 async function initPlayer() {
@@ -68,28 +38,16 @@ async function initPlayer() {
     return;
   }
   shaka.polyfill.installAll();
-  video = document.getElementById('video');
+  var video = document.getElementById('video');
   if (!video || !video.ui) { setTimeout(initPlayer, 80); return; }
 
   var ui = video.ui;
   var controls = ui.getControls();
-  player = controls.getPlayer();
+  var player = controls.getPlayer();
 
   player.addEventListener('error', function(ev) { onPlayerError(ev.detail); });
   controls.addEventListener('error', function(ev) { onPlayerError(ev.detail); });
-
-  // Catch stalls/buffering that don't always fire as hard errors
-  video.addEventListener('stalled', function() { scheduleRetry(); });
   video.addEventListener('error', function() { onPlayerError(video.error); });
-  video.addEventListener('waiting', function() {
-    // if it waits too long, nudge a retry
-    scheduleRetry();
-  });
-  video.addEventListener('playing', function() {
-    // playback resumed fine — cancel any pending retry
-    if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; }
-    retryDelay = 2000;
-  });
 
   ui.configure({
     controlPanelElements: [
@@ -111,8 +69,13 @@ async function initPlayer() {
     }
   });
 
-  manifestUri = "https://otte.cache.aiv-cdn.net/pdx-nitro/live/clients/dash/enc/0q2dyjycdn/out/v1/075b9fddd55b4fc481c9ad8c73d1fc81/cenc.mpd"; // put your stream URL here
-  attemptLoad();
+  try {
+    await player.load("https://otte.cache.aiv-cdn.net/pdx-nitro/live/clients/dash/enc/0q2dyjycdn/out/v1/075b9fddd55b4fc481c9ad8c73d1fc81/cenc.mpd");
+    video.muted = false;
+    video.play().catch(function(){});
+  } catch (e) {
+    onPlayerError(e);
+  }
 }
 
 function initFailed() {
