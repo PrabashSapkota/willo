@@ -1,141 +1,130 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="referrer" content="no-referrer">
-  <title>HELLO WORLD</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@latest/dist/controls.css" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/shaka-player@latest/dist/shaka-player.ui.js" crossorigin="anonymous"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box
-    }
-    html, body {
-      width: 100%;
-      height: 100%;
-      background: #000;
-      overflow: hidden;
-      font-family: sans-serif
-    }
-    .video-container, #player-wrap {
-      position: absolute;
-      inset: 0;
-      background: #000
-    }
-    #video {
-      width: 100%;
-      height: 100%
-    }
-    .shaka-spinner-container, .shaka-buffering-spinner, .shaka-spinner {
-      display: none !important
-    }
-    #status {
-      position: fixed;
-      left: 12px;
-      bottom: 12px;
-      z-index: 5;
-      color: rgba(255, 255, 255, .9);
-      background: rgba(0, 0, 0, .55);
-      border: 1px solid rgba(255, 255, 255, .2);
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 12px;
-      max-width: 88vw
-    }
-    #status:empty {
-      display: none
-    }
-    .hidden {
-      display: none !important
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>HELLO WORLD</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@latest/dist/controls.css" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/shaka-player@latest/dist/shaka-player.ui.js" crossorigin="anonymous"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box }
+html, body { width: 100%; height: 100%; background: #000; overflow: hidden; font-family: sans-serif }
+.video-container, #player-wrap { position: absolute; inset: 0; background: #000 }
+#video { width: 100%; height: 100% }
+.shaka-spinner-container, .shaka-buffering-spinner, .shaka-spinner { display: none !important }
+</style>
 </head>
 <body>
-
-  <div class="video-container">
-    <div id="player-wrap" data-shaka-player-container>
-      <video autoplay muted playsinline data-shaka-player id="video"></video>
-    </div>
+<div class="video-container">
+  <div id="player-wrap" data-shaka-player-container>
+    <video autoplay muted playsinline data-shaka-player id="video"></video>
   </div>
+</div>
+<script>
+var player = null;
+var video = null;
+var retryTimer = null;
+var retryDelay = 2000; // start at 2s, backs off
+var manifestUri = "";
 
-  <div id="status"></div>
+function silentLog(msg, err) {
+  // Errors go to console only — never shown to the user
+  console.error(msg, err || '');
+}
 
-  <script>
-    function showStatus(text) {
-      var s = document.getElementById('status');
-      if (s) s.textContent = text;
-    }
+function scheduleRetry() {
+  if (retryTimer) return; // already scheduled
+  retryTimer = setTimeout(function() {
+    retryTimer = null;
+    attemptLoad();
+  }, retryDelay);
+  // gentle exponential backoff, capped at 15s
+  retryDelay = Math.min(retryDelay * 1.5, 15000);
+}
 
-    function onPlayerError(error) {
-      var code = error && error.code ? error.code : 'UNKNOWN';
-      console.error('Shaka error', error);
-      showStatus('Stream failed (' + code + ')');
-    }
+async function attemptLoad() {
+  if (!player) return;
+  try {
+    await player.load(manifestUri);
+    retryDelay = 2000; // reset backoff on success
+    video.muted = false;
+    video.play().catch(function(){});
+  } catch (e) {
+    silentLog('Load failed, retrying silently', e);
+    scheduleRetry();
+  }
+}
 
-    async function initPlayer() {
-      if (!window.shaka || !shaka.Player || !shaka.Player.isBrowserSupported()) {
-        showStatus('Browser not supported');
-        return;
+function onPlayerError(error) {
+  silentLog('Shaka error (suppressed from UI)', error);
+  // Don't show anything to the user — just try to recover
+  scheduleRetry();
+}
+
+async function initPlayer() {
+  if (!window.shaka || !shaka.Player || !shaka.Player.isBrowserSupported()) {
+    silentLog('Browser not supported');
+    return;
+  }
+  shaka.polyfill.installAll();
+  video = document.getElementById('video');
+  if (!video || !video.ui) { setTimeout(initPlayer, 80); return; }
+
+  var ui = video.ui;
+  var controls = ui.getControls();
+  player = controls.getPlayer();
+
+  player.addEventListener('error', function(ev) { onPlayerError(ev.detail); });
+  controls.addEventListener('error', function(ev) { onPlayerError(ev.detail); });
+
+  // Catch stalls/buffering that don't always fire as hard errors
+  video.addEventListener('stalled', function() { scheduleRetry(); });
+  video.addEventListener('error', function() { onPlayerError(video.error); });
+  video.addEventListener('waiting', function() {
+    // if it waits too long, nudge a retry
+    scheduleRetry();
+  });
+  video.addEventListener('playing', function() {
+    // playback resumed fine — cancel any pending retry
+    if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; }
+    retryDelay = 2000;
+  });
+
+  ui.configure({
+    controlPanelElements: [
+      "play_pause", "mute", "volume", "spacer",
+      "time_and_duration", "quality", "fullscreen", "overflow_menu"
+    ]
+  });
+
+  player.configure({
+    drm: {
+      clearKeys: {
+        "1afc5f853984602e315ac4fcc70b115d": "54966e95b07c30ad7e41b25d50d41bb1"
       }
-
-      shaka.polyfill.installAll();
-
-      var video = document.getElementById('video');
-      if (!video || !video.ui) {
-        setTimeout(initPlayer, 80);
-        return;
-      }
-
-      var ui = video.ui;
-      var controls = ui.getControls();
-      var player = controls.getPlayer();
-
-      player.addEventListener('error', function(ev) { onPlayerError(ev.detail); });
-      controls.addEventListener('error', function(ev) { onPlayerError(ev.detail); });
-
-      ui.configure({
-        controlPanelElements: [
-          "play_pause",
-          "mute",
-          "volume",
-          "spacer",
-          "time_and_duration",
-          "quality",
-          "fullscreen",
-          "overflow_menu"
-        ]
-      });
-
-      player.configure({
-        drm: {
-          clearKeys: { "1afc5f853984602e315ac4fcc70b115d": "54966e95b07c30ad7e41b25d50d41bb1" }
-        },
-        streaming: { bufferingGoal: 20, rebufferingGoal: 2, bufferBehind: 20 }
-      });
-
-      try {
-        await player.load("https://otte.cache.aiv-cdn.net/pdx-nitro/live/clients/dash/enc/0q2dyjycdn/out/v1/075b9fddd55b4fc481c9ad8c73d1fc81/cenc.mpd");
-        showStatus('');
-        video.muted = false;
-        video.play().catch(function() {});
-      } catch (e) {
-        onPlayerError(e);
-      }
+    },
+    streaming: {
+      bufferingGoal: 20,
+      rebufferingGoal: 2,
+      bufferBehind: 20
     }
+  });
 
-    function initFailed() {
-      showStatus('Unable to load Shaka UI');
-    }
+  manifestUri = "https://otte.cache.aiv-cdn.net/pdx-nitro/live/clients/dash/enc/0q2dyjycdn/out/v1/075b9fddd55b4fc481c9ad8c73d1fc81/cenc.mpd"; // put your stream URL here
+  attemptLoad();
+}
 
-    document.addEventListener('shaka-ui-loaded', initPlayer);
-    document.addEventListener('shaka-ui-load-failed', initFailed);
+function initFailed() {
+  silentLog('Unable to load Shaka UI');
+}
 
-    if ('wakeLock' in navigator) {
-      navigator.wakeLock.request('screen').catch(function() {});
-    }
-  </script>
+document.addEventListener('shaka-ui-loaded', initPlayer);
+document.addEventListener('shaka-ui-load-failed', initFailed);
+
+if ('wakeLock' in navigator) {
+  navigator.wakeLock.request('screen').catch(function(){});
+}
+</script>
 </body>
 </html>
