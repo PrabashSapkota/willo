@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <title>Football - South Korea vs Czechiasss</title>
+  <title>HELLO WORLD</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@latest/dist/controls.css" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/shaka-player@latest/dist/shaka-player.ui.js" crossorigin="anonymous"></script>
   <style>
@@ -111,13 +111,13 @@
 
       player.configure({
         drm: {
-          clearKeys: { "385ceb9714b75e0cef61254f80b31002": "18dce92a2891fee68d21ede5173230f8" }
+          clearKeys: { "1afc5f853984602e315ac4fcc70b115d": "54966e95b07c30ad7e41b25d50d41bb1" }
         },
         streaming: { bufferingGoal: 20, rebufferingGoal: 2, bufferBehind: 20 }
       });
 
       try {
-        await player.load("https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/cscevwljkq/out/v1/972185041b244140860b7d56398e9aaf/cenc.mpd");
+        await player.load("https://otte.cache.aiv-cdn.net/pdx-nitro/live/clients/dash/enc/0q2dyjycdn/out/v1/075b9fddd55b4fc481c9ad8c73d1fc81/cenc.mpd");
         showStatus('');
         video.muted = false;
         video.play().catch(function() {});
