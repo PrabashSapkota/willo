@@ -111,13 +111,13 @@
 
       player.configure({
         drm: {
-          clearKeys: { "6983b606bdb28b82045403f1eefe5610": "6622407db20fcff43b6936f8acb77b5e" }
+          clearKeys: { "385ceb9714b75e0cef61254f80b31002": "18dce92a2891fee68d21ede5173230f8" }
         },
         streaming: { bufferingGoal: 20, rebufferingGoal: 2, bufferBehind: 20 }
       });
 
       try {
-        await player.load("https://a96aivottlinear-a.akamaihd.net/OTTB/pdx-nitro/live/clients/dash/enc/gpoh9qsaz6/out/v1/40e92d9dbe284a4db2bb8558b031f14e/cenc.mpd");
+        await player.load("https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/cscevwljkq/out/v1/972185041b244140860b7d56398e9aaf/cenc.mpd");
         showStatus('');
         video.muted = false;
         video.play().catch(function() {});
