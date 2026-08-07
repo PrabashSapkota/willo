@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script>(function(s){s.dataset.zone='11248356',s.src='https://llvpn.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="referrer" content="no-referrer">
@@ -113,7 +112,7 @@ async function initPlayer() {
   player.configure({
     drm: {
       clearKeys: {
-        "73c6218fa797bce56ec12bf5cc7e2dae": "ec14e4df9b165a3631251246242f0e91"
+        "0b42be2664d7e811d04f3e504e0924c5": "ae24090123b8c72ac5404dc152847cb8"
       }
     },
     streaming: {
@@ -124,7 +123,7 @@ async function initPlayer() {
   });
 
   try {
-    await player.load("https://footfytv.pro/proxy/direct?url=https://a96aivottlinear-a.akamaihd.net/OTTB/pdx-nitro/live/clients/dash/enc/x6oqpug9mu/out/v1/502432e8607547b4a6278d3cc64d5b78/cenc.mpd");
+    await player.load("https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/8m8cd46i1t/out/v1/83985c68e4174e90a58a1f2c024be4c9/cenc.mpd");
     video.muted = false;
     video.play().catch(function(){});
   } catch (e) {
