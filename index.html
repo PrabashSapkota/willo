@@ -22,93 +22,78 @@ html, body { width: 100%; height: 100%; background: #000; overflow: hidden; font
   </div>
 </div>
 <script>
-// Prevent Right-Click Context Menu
+// Optional: light protection (remove completely while debugging)
 document.addEventListener('contextmenu', function(e) {
   e.preventDefault();
 }, false);
 
-// Prevent Common DevTools Keyboard Shortcuts
 document.addEventListener('keydown', function(e) {
-  // F12
   if (e.key === 'F12' || e.keyCode === 123) {
     e.preventDefault();
     return false;
   }
-  // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+Shift+K
   if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c' || e.key === 'K' || e.key === 'k')) {
     e.preventDefault();
     return false;
   }
-  // Ctrl+U (View Source)
   if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
     e.preventDefault();
     return false;
   }
-  // Cmd+Alt+I, Cmd+Alt+J, Cmd+Alt+U (macOS)
   if (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'U' || e.key === 'u')) {
     e.preventDefault();
     return false;
   }
 }, false);
 
-// Infinite Debugger Loop Deterrent
-(function() {
-  function blockDevTools() {
-    function debuggerCheck() {
-      (function() {
-        return false;
-      })
-      ["constructor"]("debugger")();
-    }
-    try {
-      debuggerCheck();
-    } catch (err) {}
-  }
-  setInterval(blockDevTools, 100);
-})();
-
-// Suppress and Override Console Methods
-window.console = {
-  log: function() {},
-  error: function() {},
-  warn: function() {},
-  info: function() {},
-  debug: function() {},
-  trace: function() {}
-};
-
-function silentLog(msg, err) {
-  // Suppressed completely
-}
-
 function onPlayerError(error) {
-  silentLog('Shaka error (suppressed from UI, no retry)', error);
+  // Log to console so you can see real errors while testing
+  console.error('Shaka Player Error:', error);
 }
 
 async function initPlayer() {
   if (!window.shaka || !shaka.Player || !shaka.Player.isBrowserSupported()) {
-    silentLog('Browser not supported');
+    console.error('Browser not supported by Shaka Player');
     return;
   }
+
   shaka.polyfill.installAll();
+
   var video = document.getElementById('video');
-  if (!video || !video.ui) { setTimeout(initPlayer, 80); return; }
+  if (!video || !video.ui) {
+    setTimeout(initPlayer, 80);
+    return;
+  }
 
   var ui = video.ui;
   var controls = ui.getControls();
   var player = controls.getPlayer();
 
-  player.addEventListener('error', function(ev) { onPlayerError(ev.detail); });
-  controls.addEventListener('error', function(ev) { onPlayerError(ev.detail); });
-  video.addEventListener('error', function() { onPlayerError(video.error); });
+  player.addEventListener('error', function(ev) {
+    onPlayerError(ev.detail);
+  });
+  controls.addEventListener('error', function(ev) {
+    onPlayerError(ev.detail);
+  });
+  video.addEventListener('error', function() {
+    onPlayerError(video.error);
+  });
 
+  // UI configuration
   ui.configure({
     controlPanelElements: [
-      "play_pause", "mute", "volume", "spacer",
-      "time_and_duration", "quality", "fullscreen", "overflow_menu"
+      "play_pause",
+      "mute",
+      "volume",
+      "spacer",
+      "time_and_duration",
+      "quality",
+      "fullscreen",
+      "overflow_menu"
     ]
   });
 
+  // Player + DRM configuration
   player.configure({
     drm: {
       clearKeys: {
@@ -123,21 +108,29 @@ async function initPlayer() {
   });
 
   try {
+    // IMPORTANT: Keep the video muted for reliable autoplay inside iframes
+    video.muted = true;
+
     await player.load("https://otte.cache.aiv-cdn.net/iad-nitro/live/clients/dash/enc/b3b3fkmrbl/out/v1/1084d5c9a97a4c5b9f9554c88f486646/cenc.mpd");
-    video.muted = false;
-    video.play().catch(function(){});
+
+    // Start playback (still muted). User can unmute via the Shaka volume button.
+    video.play().catch(function(err) {
+      console.warn('Autoplay was blocked or failed:', err);
+    });
+
   } catch (e) {
     onPlayerError(e);
   }
 }
 
 function initFailed() {
-  silentLog('Unable to load Shaka UI');
+  console.error('Unable to load Shaka UI');
 }
 
 document.addEventListener('shaka-ui-loaded', initPlayer);
 document.addEventListener('shaka-ui-load-failed', initFailed);
 
+// Optional: keep screen awake
 if ('wakeLock' in navigator) {
   navigator.wakeLock.request('screen').catch(function(){});
 }
