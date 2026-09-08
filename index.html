@@ -97,7 +97,7 @@ async function initPlayer() {
   player.configure({
     drm: {
       clearKeys: {
-        "eed810fa03bb3e03704710ad05d43715": "28422d32ffd865b75337869a4b57a363"
+        "69a5aa835a061ce64a630d1046727e40": "d02feac8a999bd06bf4059bf33411749"
       }
     },
     streaming: {
@@ -111,7 +111,7 @@ async function initPlayer() {
     // IMPORTANT: Keep the video muted for reliable autoplay inside iframes
     video.muted = true;
 
-    await player.load("https://otte.cache.aiv-cdn.net/iad-nitro/live/clients/dash/enc/kkxkbfrgfk/out/v1/ea1c17d66e464c6fad76dbdc1962acd9/cenc.mpd");
+    await player.load("https://a96aivottlinear-a.akamaihd.net/OTTB/iad-nitro/enc/rhf2dwosdt/out/v1/ee550d2a68d846c797e6ce4de2e8b76d/cenc.mpd");
 
     // Start playback (still muted). User can unmute via the Shaka volume button.
     video.play().catch(function(err) {
